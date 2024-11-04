@@ -17,7 +17,8 @@ export class Neo4jService {
     lastName: string,
     email: string,
     gender: string,
-    date_of_birth: Date
+    date_of_birth: string,
+    password: string
   ) {
     const session = this.getSession();
     const query = `
@@ -28,7 +29,8 @@ export class Neo4jService {
         lastName: $lastName,
         email: $email,
         gender: $gender,
-        date_of_birth: datetime($date_of_birth)
+        date_of_birth: date($date_of_birth),
+        password: $password
       })
       RETURN u
     `;
@@ -40,7 +42,8 @@ export class Neo4jService {
         lastName,
         email,
         gender,
-        date_of_birth: date_of_birth.toISOString() // Convertimos a formato ISO para Neo4j
+        date_of_birth,
+        password
       });
       return result.records[0].get('u');
     } finally {
@@ -48,15 +51,4 @@ export class Neo4jService {
     }
   }
 
-  // Método para obtener todas las canciones de Neo4j
-  async getAllSongs() {
-    const session = this.getSession();
-    const query = `MATCH (s:Song) RETURN s`;
-    try {
-      const result = await session.run(query);
-      return result.records.map(record => record.get('s').properties);
-    } finally {
-      await session.close();
-    }
-  }
 }
