@@ -9,15 +9,39 @@ export class Neo4jService {
     return this.driver.session();
   }
 
-  // Método para crear un usuario en la base de datos
-  async createUserNode(username: string, age: number, email: string) {
+  // Método actualizado para crear un usuario con la estructura completa
+  async createUserNode(
+    usuario_id: number,
+    username: string,
+    firstName: string,
+    lastName: string,
+    email: string,
+    gender: string,
+    date_of_birth: Date
+  ) {
     const session = this.getSession();
     const query = `
-      CREATE (u:User {username: $username, age: $age, email: $email})
+      CREATE (u:User {
+        usuario_id: $usuario_id,
+        username: $username,
+        firstName: $firstName,
+        lastName: $lastName,
+        email: $email,
+        gender: $gender,
+        date_of_birth: datetime($date_of_birth)
+      })
       RETURN u
     `;
     try {
-      const result = await session.run(query, { username, age, email });
+      const result = await session.run(query, {
+        usuario_id,
+        username,
+        firstName,
+        lastName,
+        email,
+        gender,
+        date_of_birth: date_of_birth.toISOString() // Convertimos a formato ISO para Neo4j
+      });
       return result.records[0].get('u');
     } finally {
       await session.close();
