@@ -28,9 +28,4 @@ export class RecommenderController {
     return await this.neo4jService.recommendArtists(userId);
   }
     
-// CONTROLADOR METODO PARA PROBAR ERRORES///////////////////////////////////
-  @Get('test-connection')
-  async testConnection() {
-    return this.neo4jService.testConnection();
-  }
 }

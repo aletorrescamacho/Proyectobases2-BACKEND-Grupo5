@@ -215,25 +215,5 @@ export class Neo4jService {
   }
   
 
-    async testConnection() {
-  const session = this.getSession()
-  console.log('Session established:', session);
-  const query = `
-    MATCH (u:User)
-    RETURN u LIMIT 1
-  `;
-
-  ///////////////////METODO PARA PROBAR ERRORES//////////////////////////////////////
-  try {
-    const result = await session.run(query);
-    console.log('Test Query Results:', result.records);
-    return result.records.map(record => record.get('u').properties);
-  } catch (error) {
-    console.error('Error executing test query:', error);
-    throw new Error('Error fetching test data. Please try again later.');
-  } finally {
-    await session.close();
-  }
-}
 
 }
