@@ -27,5 +27,7 @@ export class RecommenderController {
   async recommendArtists(@Param('userId') userId: number) {
     return await this.neo4jService.recommendArtists(userId);
   }
+
+  
     
 }

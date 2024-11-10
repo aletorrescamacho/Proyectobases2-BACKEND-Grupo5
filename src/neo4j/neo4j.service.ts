@@ -213,6 +213,28 @@ export class Neo4jService {
     return result.records.map(record => record.get('a').properties);
   }
   
+  async verifyUser(email: string, password: string) {
+    const session = this.getSession();
+    try {
+      const result = await session.run(
+        `
+        MATCH (u:User { email: $email, password: $password })
+        RETURN u
+        `,
+        { email, password }
+      );
+
+      if (result.records.length === 0) {
+        return null; // Usuario no encontrado o credenciales incorrectas
+      }
+
+      // Retorna los datos del usuario
+      const user = result.records[0].get('u').properties;
+      return user;
+    } finally {
+      await session.close();
+    }
+  }
 
 
 }
