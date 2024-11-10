@@ -50,7 +50,6 @@ export class Neo4jService {
     }
   }
 
-  //user escucha cancion
   async listenToSong(userId: number, trackId: string) {
     const session = this.getSession();
     const query = `
@@ -60,13 +59,13 @@ export class Neo4jService {
     `;
     try {
       const result = await session.run(query, { userId, trackId });
-      
+
       if (result.records.length > 0) {
         console.log("Relación ESCUCHO creada entre el usuario y la canción.");
-        return true;
+        return { message: 'Relación ESCUCHO creada', success: true };
       } else {
         console.log("No se encontraron nodos de usuario o canción con los IDs especificados.");
-        return false;
+        return { message: 'Usuario o canción no encontrados', success: false };
       }
     } catch (error) {
       console.error("Error al crear relación ESCUCHO:", error);
