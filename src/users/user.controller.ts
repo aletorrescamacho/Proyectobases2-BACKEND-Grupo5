@@ -1,4 +1,4 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, Request, UnauthorizedException } from '@nestjs/common';
 import { Neo4jService } from '../neo4j/neo4j.service';
 import { CreateUserDto } from './dto/create-user.dto';
 
@@ -6,32 +6,60 @@ import { CreateUserDto } from './dto/create-user.dto';
 export class UserController {
   constructor(private readonly neo4jService: Neo4jService) {}
 
-  @Post()
-  async createUser(@Body() createUserDto: CreateUserDto) {
+  @Post('register')
+  async createUser(@Body() createUserDto: CreateUserDto, @Request() req) {
     const { usuario_id, username, firstName, lastName, email, gender, date_of_birth, password } = createUserDto;
-    return this.neo4jService.createUserNode(usuario_id, username, firstName, lastName, email, gender, date_of_birth, password);
+    return this.neo4jService.createUserNode(
+      usuario_id,
+      username,
+      firstName,
+      lastName,
+      email,
+      gender,
+      date_of_birth,
+      password,
+      req // Pasa req para guardar la sesión
+    );
   }
 
   // Relación ESCUCHO entre Usuario y Canción
   @Post('listen-to-song')
-  async listenToSong(@Body() body: { userId: number, trackId: string }) {
-    const { userId, trackId } = body;
+  async listenToSong(@Request() req, @Body('trackId') trackId: string) {
+    const userId = req.session.userId; // Obtiene el userId de la sesión
+    if (!userId) {
+      throw new UnauthorizedException('User not logged in');
+    }
     return this.neo4jService.listenToSong(userId, trackId);
   }
 
   // Relación TIENE_EN_FAVORITOS entre Usuario y Canción
   @Post('add-to-favorites')
-  async addToFavorites(@Body() body: { userId: number, trackId: string }) {
-    const { userId, trackId } = body;
+  async addToFavorites(@Request() req, @Body('trackId') trackId: string) {
+    const userId = req.session.userId; // Obtiene el userId de la sesión
+    if (!userId) {
+      throw new UnauthorizedException('User not logged in');
+    }
     return this.neo4jService.addToFavorites(userId, trackId);
   }
 
   // Relación SIGUE_A entre Usuario y Artista
   @Post('follow-artist')
-  async followArtist(@Body() body: { userId: number, artistId: number }) {
-    const { userId, artistId } = body;
+  async followArtist(@Request() req, @Body('artistId') artistId: number) {
+    const userId = req.session.userId; // Obtiene el userId de la sesión
+    if (!userId) {
+      throw new UnauthorizedException('User not logged in');
+    }
     return this.neo4jService.followArtist(userId, artistId);
   }
 
+  //LOGIN
+  @Post('login')
+  async login(
+    @Body('email') email: string,
+    @Body('password') password: string,
+    @Request() req
+  ) {
+    return await this.neo4jService.authenticateUser(email, password, req);
+  }
 }
 

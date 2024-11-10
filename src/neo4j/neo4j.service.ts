@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, UnauthorizedException } from '@nestjs/common';
 import { Driver, Session } from 'neo4j-driver';
 
 @Injectable()
@@ -18,12 +18,13 @@ export class Neo4jService {
     email: string,
     gender: string,
     date_of_birth: string,
-    password: string
+    password: string,
+    req: any // Agregar req para guardar la sesión
   ) {
     const session = this.getSession();
     const query = `
       CREATE (u:User {
-        usuario_id: toInteger($usuario_id),  // Forzar usuario_id a entero
+        usuario_id: toInteger($usuario_id),
         username: $username,
         firstName: $firstName,
         lastName: $lastName,
@@ -32,8 +33,9 @@ export class Neo4jService {
         date_of_birth: date($date_of_birth),
         password: $password
       })
-      RETURN u
+      RETURN u.usuario_id AS userId
     `;
+  
     try {
       const result = await session.run(query, {
         usuario_id,
@@ -45,7 +47,13 @@ export class Neo4jService {
         date_of_birth,
         password
       });
-      return result.records[0].get('u');
+  
+      const userId = result.records[0].get('userId');
+  
+      // Guarda el userId en la sesión
+      req.session.userId = userId;
+  
+      return { message: 'User created successfully', userId };
     } finally {
       await session.close();
     }
@@ -214,24 +222,67 @@ export class Neo4jService {
     return result.records.map(record => record.get('a').properties);
   }
   
-///////////////////METODO PARA PROBAR ERRORES//////////////////////////////////////
-  async testConnection() {
-    const session = this.getSession()
-    console.log('Session established:', session);
+  /////////////////////////////////////////////////////////Metodos para encontrar canciones y artistas//////////////////////////////////
+
+  async findSongByName(songName: string) {
+    const session = this.getSession();
     const query = `
-      MATCH (u:User)
-      RETURN u LIMIT 1
+      MATCH (s:Song)
+      WHERE s.track_name CONTAINS $songName
+      RETURN s
     `;
     try {
-      const result = await session.run(query);
-      console.log('Test Query Results:', result.records);
-      return result.records.map(record => record.get('u').properties);
-    } catch (error) {
-      console.error('Error executing test query:', error);
-      throw new Error('Error fetching test data. Please try again later.');
+      const result = await session.run(query, { songName });
+      return result.records.map(record => record.get('s').properties);
     } finally {
       await session.close();
     }
+  }
+
+  // Método para buscar un artista por nombre
+  async findArtistByName(artistName: string) {
+    const session = this.getSession();
+    const query = `
+      MATCH (a:Artist)
+      WHERE a.artists CONTAINS $artistName
+      RETURN a
+    `;
+    try {
+      const result = await session.run(query, { artistName });
+      return result.records.map(record => record.get('a').properties);
+    } finally {
+      await session.close();
+    }
+  }
+
+ ///////////////////////////////////////////Metodo para encontrar user despues de inicio de sesion//////////////////////////////////////
+
+ async authenticateUser(email: string, password: string, req: any) {
+  const session = this.getSession();
+  const query = `
+    MATCH (u:User {email: $email, password: $password})
+    RETURN u.usuario_id AS userId
+  `;
+
+  try {
+    const result = await session.run(query, { email, password });
+    
+    if (result.records.length === 0) {
+      throw new UnauthorizedException('Invalid email or password');
+    }
+
+    const userId = result.records[0].get('userId');
+    req.session.userId = userId; // Guarda el userId en la sesión
+    return { message: 'Login successful' };
+  } finally {
+    await session.close();
+  }
 }
+
+
+
+
+
+
 
 }
