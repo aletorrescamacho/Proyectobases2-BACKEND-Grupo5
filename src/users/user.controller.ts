@@ -35,6 +35,7 @@ export class UserController {
   // Relación TIENE_EN_FAVORITOS entre Usuario y Canción
   @Post('add-to-favorites')
   async addToFavorites(@Request() req, @Body('trackId') trackId: string) {
+    console.log(req.session.userId)
     const userId = req.session.userId; // Obtiene el userId de la sesión
     if (!userId) {
       throw new UnauthorizedException('User not logged in');

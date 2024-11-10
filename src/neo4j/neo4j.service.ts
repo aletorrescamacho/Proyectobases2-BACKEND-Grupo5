@@ -52,6 +52,7 @@ export class Neo4jService {
   
       // Guarda el userId en la sesión
       req.session.userId = userId;
+      console.log(req.session.userId)
   
       return { message: 'User created successfully', userId };
     } finally {
