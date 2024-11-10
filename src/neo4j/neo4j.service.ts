@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { Driver, Session } from 'neo4j-driver';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
-import { v4 as uuidv4 } from 'uuid';
+
 
 @Injectable()
 export class Neo4jService {
@@ -14,7 +14,7 @@ export class Neo4jService {
   // Método actualizado para crear un usuario con la estructura completa
   async createUserNode(createUserDto: CreateUserDto) {
     const { username, firstName, lastName, email, gender, date_of_birth, password } = createUserDto;
-    const usuario_id = uuidv4(); // Genera un ID único para el usuario
+    const usuario_id = Math.floor(100000 + Math.random() * 900000);
 
     const session = this.getSession()
     try {
