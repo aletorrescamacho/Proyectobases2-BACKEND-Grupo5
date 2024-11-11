@@ -32,7 +32,7 @@ export class UserController {
   }
 
 
-  // Relación TIENE_EN_FAVORITOS entre Usuario y Canción
+  // Relación TIENE_EN_FAVORITOS entre Usuario y Canción MODIFICADO PARA QUE MANTENGA LA SESION
   @Post('add-to-favorites')
   async addToFavorites(@Body() body: { trackId: string }, @Request() req) {
     // Verifica que el usuario esté autenticado
@@ -51,8 +51,16 @@ export class UserController {
 
   // Relación SIGUE_A entre Usuario y Artista
   @Post('follow-artist')
-  async followArtist(@Body() body: { userId: number, artistId: number }) {
-    const { userId, artistId } = body;
+  async followArtist(@Body() body: { artistId: number }, @Request() req) {
+    // Verifica que el usuario esté autenticado
+    if (!req.session.user) {
+      throw new UnauthorizedException('Usuario no autenticado');
+    }
+
+    // Obtiene el userId desde la sesión activa
+    const userId = req.session.user.userId;
+    const artistId = body.artistId;
+
     return this.neo4jService.followArtist(userId, artistId);
   }
 
