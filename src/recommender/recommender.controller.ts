@@ -48,8 +48,16 @@ export class RecommenderController {
   }
 
   
-  @Get('recommend-artists-by-songs/:userId')
-  async recommendArtists(@Param('userId') userId: number) {
+  @Get('recommend-artists-by-songs')
+  async recommendArtists(@Request() req) {
+    // Verifica que el usuario esté autenticado
+    if (!req.session.user) {
+      throw new UnauthorizedException('Usuario no autenticado');
+    }
+
+    // Obtiene el userId desde la sesión activa
+    const userId = req.session.user.userId;
+
     return await this.neo4jService.recommendArtists(userId);
   }
 
