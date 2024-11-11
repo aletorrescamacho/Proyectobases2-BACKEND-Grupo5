@@ -1,6 +1,8 @@
 import { Controller, Get, Param, Request, UnauthorizedException } from '@nestjs/common';
 import { Neo4jService } from '../neo4j/neo4j.service';
 
+//funcionan todos los metodos con las sesiones activas
+
 @Controller('recommender')
 export class RecommenderController {
   constructor(private readonly neo4jService: Neo4jService) {}
