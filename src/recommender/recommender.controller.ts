@@ -21,8 +21,16 @@ export class RecommenderController {
 
 
   
-  @Get('recommend-by-second-genre/:userId')
-  async recommendBySecondGenre(@Param('userId') userId: number) {
+  @Get('recommend-by-second-genre')
+  async recommendBySecondGenre(@Request() req) {
+    // Verifica que el usuario esté autenticado
+    if (!req.session.user) {
+      throw new UnauthorizedException('Usuario no autenticado');
+    }
+
+    // Obtiene el userId desde la sesión activa
+    const userId = req.session.user.userId;
+
     return await this.neo4jService.recommendBySecondGenre(userId);
   }
 
