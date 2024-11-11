@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, Request, UnauthorizedException } from '@nestjs/common';
 import { Neo4jService } from '../neo4j/neo4j.service';
 
 @Controller('recommender')
@@ -6,10 +6,19 @@ export class RecommenderController {
   constructor(private readonly neo4jService: Neo4jService) {}
 
   
-  @Get('recommend-by-genre/:userId')
-  async recommendByGenre(@Param('userId') userId: number) {
+  @Get('recommend-by-genre')
+  async recommendByGenre(@Request() req) {
+    // Verifica que el usuario esté autenticado
+    if (!req.session.user) {
+      throw new UnauthorizedException('Usuario no autenticado');
+    }
+
+    // Obtiene el userId desde la sesión activa
+    const userId = req.session.user.userId;
+
     return await this.neo4jService.recommendByGenre(userId);
   }
+
 
   
   @Get('recommend-by-second-genre/:userId')
