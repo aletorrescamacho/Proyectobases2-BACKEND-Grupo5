@@ -49,7 +49,7 @@ export class UserController {
 
 
 
-  // Relación SIGUE_A entre Usuario y Artista
+  // Relación SIGUE_A entre Usuario y Artista ACTUALIZADO MANTIENE SESION ACTIVA
   @Post('follow-artist')
   async followArtist(@Body() body: { artistId: number }, @Request() req) {
     // Verifica que el usuario esté autenticado
