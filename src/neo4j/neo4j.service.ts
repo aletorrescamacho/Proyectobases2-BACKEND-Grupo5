@@ -50,6 +50,7 @@ export class Neo4jService {
     }
   }
 
+  //usuario escucha cancion, ya funciona con la sesion del usuario
   async listenToSong(userId: number, trackId: string) {
     const session = this.getSession();
     const query = `

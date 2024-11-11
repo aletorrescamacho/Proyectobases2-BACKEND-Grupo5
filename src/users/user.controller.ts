@@ -34,10 +34,20 @@ export class UserController {
 
   // Relación TIENE_EN_FAVORITOS entre Usuario y Canción
   @Post('add-to-favorites')
-  async addToFavorites(@Body() body: { userId: number, trackId: string }) {
-    const { userId, trackId } = body;
+  async addToFavorites(@Body() body: { trackId: string }, @Request() req) {
+    // Verifica que el usuario esté autenticado
+    if (!req.session.user) {
+      throw new UnauthorizedException('Usuario no autenticado');
+    }
+
+    // Obtiene el userId desde la sesión activa
+    const userId = req.session.user.userId;
+    const trackId = body.trackId;
+
     return this.neo4jService.addToFavorites(userId, trackId);
   }
+
+
 
   // Relación SIGUE_A entre Usuario y Artista
   @Post('follow-artist')
