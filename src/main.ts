@@ -13,7 +13,7 @@ async function bootstrap() {
     })
   );
   app.enableCors({
-    origin: ['http://localhost:3000', 'https://your-app-name.up.railway.app'], // Agrega aquí el dominio de tu frontend
+    origin: ['http://localhost:3000', 'https://proyectobases2-backend-grupo5-production.up.railway.app/'], // Agrega aquí el dominio de tu frontend
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true // Habilita las cookies si estás usando sesiones
   });

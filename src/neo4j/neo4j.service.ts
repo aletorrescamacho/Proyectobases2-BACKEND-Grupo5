@@ -213,6 +213,8 @@ export class Neo4jService {
     return result.records.map(record => record.get('a').properties);
   }
   
+///////////////////////////////////////////VErificar inicio de sesion del usuario////////////////////////////////////////////////
+
   async verifyUser(email: string, password: string) {
     const session = this.getSession();
     try {
@@ -236,29 +238,41 @@ export class Neo4jService {
     }
   }
 
- ///////////////////////////////////////////Metodo para encontrar user despues de inicio de sesion//////////////////////////////////////
+/////////////////////////////////////////////////////////Metodos para encontrar canciones y artistas//////////////////////////////////
 
- async authenticateUser(email: string, password: string, req: any) {
-  const session = this.getSession();
-  const query = `
-    MATCH (u:User {email: $email, password: $password})
-    RETURN u.usuario_id AS userId
-  `;
-
-  try {
-    const result = await session.run(query, { email, password });
-    
-    if (result.records.length === 0) {
-      throw new UnauthorizedException('Invalid email or password');
+  async findSongByName(songName: string) {
+    const session = this.getSession();
+    const query = `
+      MATCH (s:Song)
+      WHERE s.track_name CONTAINS $songName
+      RETURN s
+    `;
+    try {
+      const result = await session.run(query, { songName });
+      return result.records.map(record => record.get('s').properties);
+    } finally {
+      await session.close();
     }
-
-    const userId = result.records[0].get('userId');
-    req.session.userId = userId; // Guarda el userId en la sesión
-    return { message: 'Login successful' };
-  } finally {
-    await session.close();
   }
-}
+
+  // Método para buscar un artista por nombre
+  async findArtistByName(artistName: string) {
+    const session = this.getSession();
+    const query = `
+      MATCH (a:Artist)
+      WHERE a.artists CONTAINS $artistName
+      RETURN a
+    `;
+    try {
+      const result = await session.run(query, { artistName });
+      return result.records.map(record => record.get('a').properties);
+    } finally {
+      await session.close();
+    }
+  }
+
+
+ 
 
 
 
