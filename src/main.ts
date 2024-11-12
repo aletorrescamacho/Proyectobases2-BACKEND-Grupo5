@@ -4,27 +4,19 @@ import * as session from 'express-session';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
-  // Configuración temporal de CORS
-  app.enableCors({
-    origin: 'https://proyectobases2-backend-grupo5-production.up.railway.app/', // Coloca aquí tu URL en Railway
-    credentials: true, // Permite el uso de cookies
-  });
-
-  // Configuración de sesiones
   app.use(
     session({
-      secret: 'your-secret-key',
+      secret: 'my_secret_key', // Usa cualquier cadena para esta clave
       resave: false,
       saveUninitialized: false,
-      cookie: {
-        maxAge: 3600000,
-        secure: true, // Asegúrate de que sea `true` si estás usando HTTPS en Railway
-        sameSite: 'none' // Necesario para permitir cookies de sesión en CORS
-      },
-    }),
+      cookie: { maxAge: 3600000 }, // 1 hora de duración de la sesión
+    })
   );
-
+  app.enableCors({
+    origin: ['http://localhost:3000', 'https://your-app-name.up.railway.app'], // Agrega aquí el dominio de tu frontend
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true // Habilita las cookies si estás usando sesiones
+  });
   await app.listen(3001);
 }
 bootstrap();

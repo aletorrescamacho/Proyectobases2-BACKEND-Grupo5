@@ -1,5 +1,7 @@
 import { Injectable, Inject, UnauthorizedException } from '@nestjs/common';
 import { Driver, Session } from 'neo4j-driver';
+import { CreateUserDto } from 'src/users/dto/create-user.dto';
+
 
 @Injectable()
 export class Neo4jService {
@@ -10,57 +12,45 @@ export class Neo4jService {
   }
 
   // Método actualizado para crear un usuario con la estructura completa
-  async createUserNode(
-    usuario_id: number,
-    username: string,
-    firstName: string,
-    lastName: string,
-    email: string,
-    gender: string,
-    date_of_birth: string,
-    password: string,
-    req: any // Agregar req para guardar la sesión
-  ) {
-    const session = this.getSession();
-    const query = `
-      CREATE (u:User {
-        usuario_id: toInteger($usuario_id),
-        username: $username,
-        firstName: $firstName,
-        lastName: $lastName,
-        email: $email,
-        gender: $gender,
-        date_of_birth: date($date_of_birth),
-        password: $password
-      })
-      RETURN u.usuario_id AS userId
-    `;
-  
+  async createUserNode(createUserDto: CreateUserDto) {
+    const { username, firstName, lastName, email, gender, date_of_birth, password } = createUserDto;
+    const usuario_id = Math.floor(100000000 + Math.random() * 900000000);
+
+    const session = this.getSession()
     try {
-      const result = await session.run(query, {
-        usuario_id,
-        username,
-        firstName,
-        lastName,
-        email,
-        gender,
-        date_of_birth,
-        password
-      });
-  
-      const userId = result.records[0].get('userId');
-  
-      // Guarda el userId en la sesión
-      req.session.userId = userId;
-      console.log(req.session.userId)
-  
-      return { message: 'User created successfully', userId };
+      const result = await session.run(
+        `
+        CREATE (u:User {
+          usuario_id: $usuario_id,
+          username: $username,
+          firstName: $firstName,
+          lastName: $lastName,
+          email: $email,
+          gender: $gender,
+          date_of_birth: $date_of_birth,
+          password: $password
+        })
+        RETURN u
+        `,
+        {
+          usuario_id,
+          username,
+          firstName,
+          lastName,
+          email,
+          gender,
+          date_of_birth,
+          password
+        }
+      );
+
+      return result.records[0].get('u').properties;
     } finally {
       await session.close();
     }
   }
 
-  //user escucha cancion
+  //usuario escucha cancion, ya funciona con la sesion del usuario
   async listenToSong(userId: number, trackId: string) {
     const session = this.getSession();
     const query = `
@@ -70,13 +60,13 @@ export class Neo4jService {
     `;
     try {
       const result = await session.run(query, { userId, trackId });
-      
+
       if (result.records.length > 0) {
         console.log("Relación ESCUCHO creada entre el usuario y la canción.");
-        return true;
+        return { message: 'Relación ESCUCHO creada', success: true };
       } else {
         console.log("No se encontraron nodos de usuario o canción con los IDs especificados.");
-        return false;
+        return { message: 'Usuario o canción no encontrados', success: false };
       }
     } catch (error) {
       console.error("Error al crear relación ESCUCHO:", error);
@@ -223,34 +213,24 @@ export class Neo4jService {
     return result.records.map(record => record.get('a').properties);
   }
   
-  /////////////////////////////////////////////////////////Metodos para encontrar canciones y artistas//////////////////////////////////
-
-  async findSongByName(songName: string) {
+  async verifyUser(email: string, password: string) {
     const session = this.getSession();
-    const query = `
-      MATCH (s:Song)
-      WHERE s.track_name CONTAINS $songName
-      RETURN s
-    `;
     try {
-      const result = await session.run(query, { songName });
-      return result.records.map(record => record.get('s').properties);
-    } finally {
-      await session.close();
-    }
-  }
+      const result = await session.run(
+        `
+        MATCH (u:User { email: $email, password: $password })
+        RETURN u
+        `,
+        { email, password }
+      );
 
-  // Método para buscar un artista por nombre
-  async findArtistByName(artistName: string) {
-    const session = this.getSession();
-    const query = `
-      MATCH (a:Artist)
-      WHERE a.artists CONTAINS $artistName
-      RETURN a
-    `;
-    try {
-      const result = await session.run(query, { artistName });
-      return result.records.map(record => record.get('a').properties);
+      if (result.records.length === 0) {
+        return null; // Usuario no encontrado o credenciales incorrectas
+      }
+
+      // Retorna los datos del usuario
+      const user = result.records[0].get('u').properties;
+      return user;
     } finally {
       await session.close();
     }
