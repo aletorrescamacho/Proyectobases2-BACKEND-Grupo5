@@ -197,7 +197,7 @@ export class Neo4jService {
   }
 
   
-  // Recomendación de otras canciones del mismo artista LISTO
+  // Recomendación de aritstas por las canciones mas escuchadas LISTO
   async recommendArtists(userId: number) {
     const session = this.getSession();
     const query = `
