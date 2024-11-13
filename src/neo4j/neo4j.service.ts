@@ -240,20 +240,21 @@ export class Neo4jService {
 
 /////////////////////////////////////////////////////////Metodos para encontrar canciones y artistas//////////////////////////////////
 
-  async findSongByName(songName: string) {
-    const session = this.getSession();
-    const query = `
-      MATCH (s:Song)
-      WHERE s.track_name CONTAINS $songName
-      RETURN s
-    `;
-    try {
-      const result = await session.run(query, { songName });
-      return result.records.map(record => record.get('s').properties);
-    } finally {
-      await session.close();
-    }
+async findSongByName(songName: string) {
+  const session = this.getSession();
+  const query = `
+    MATCH (s:Song)
+    WHERE toLower(s.track_name) CONTAINS toLower($songName)
+    RETURN s
+  `;
+  try {
+    const result = await session.run(query, { songName });
+    return result.records.map(record => record.get('s').properties);
+  } finally {
+    await session.close();
   }
+}
+
 
   // Método para buscar un artista por nombre
   async findArtistByName(artistName: string) {
