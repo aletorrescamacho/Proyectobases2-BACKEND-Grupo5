@@ -9,7 +9,12 @@ async function bootstrap() {
       secret: 'my_secret_key', // Usa cualquier cadena para esta clave
       resave: false,
       saveUninitialized: false,
-      cookie: { maxAge: 3600000 }, // 1 hora de duración de la sesión
+      cookie: {
+        maxAge: 3600000, // 1 hora en milisegundos
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production', // Solo en producción
+        sameSite: 'lax' // Esto permite las cookies entre diferentes orígenes
+      }
     })
   );
   app.enableCors({
