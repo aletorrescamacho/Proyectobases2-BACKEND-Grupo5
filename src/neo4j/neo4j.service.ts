@@ -261,7 +261,7 @@ async findSongByName(songName: string) {
     const session = this.getSession();
     const query = `
       MATCH (a:Artist)
-      WHERE a.artists CONTAINS $artistName
+      WHERE toLower(a.artists) CONTAINS toLower($artistName)
       RETURN a
     `;
     try {
@@ -271,6 +271,7 @@ async findSongByName(songName: string) {
       await session.close();
     }
   }
+  
 
 
  

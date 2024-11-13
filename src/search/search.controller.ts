@@ -12,8 +12,8 @@ export class SearchController {
   }
 
   // Método para buscar un artista por nombre
-  @Get('artist/:name')
-  async searchArtist(@Param('name') name: string) {
+  @Post('search-artist')
+  async searchArtist(@Body('name') name: string) {
     return this.neo4jService.findArtistByName(name);
   }
 }
