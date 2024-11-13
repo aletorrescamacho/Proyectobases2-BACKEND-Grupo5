@@ -13,7 +13,7 @@ async function bootstrap() {
         maxAge: 3600000, // 1 hora en milisegundos
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production', // Solo en producción
-        sameSite: 'lax' // Esto permite las cookies entre diferentes orígenes
+        sameSite: 'None' // Esto permite las cookies entre diferentes orígenes
       }
     })
   );
