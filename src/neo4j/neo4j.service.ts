@@ -14,7 +14,8 @@ export class Neo4jService {
   // Método actualizado para crear un usuario con la estructura completa
   async createUserNode(createUserDto: CreateUserDto) {
     const { username, firstName, lastName, email, gender, date_of_birth, password } = createUserDto;
-    const usuario_id = Number(Math.floor(100000000 + Math.random() * 900000000));
+    const usuario_ids = Math.floor(100000000 + Math.random() * 900000000).toString();
+    const usuario_id = Number(usuario_ids);
 
     const session = this.getSession()
     try {
