@@ -13,7 +13,6 @@ async function bootstrap() {
         maxAge: 3600000, // 1 hora en milisegundos
         httpOnly: false,
         secure: false, 
-        sameSite: 'None' // Esto permite las cookies entre diferentes orígenes
       }
     })
   );
