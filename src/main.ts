@@ -12,7 +12,7 @@ async function bootstrap() {
       cookie: {
         maxAge: 3600000, // 1 hora en milisegundos
         httpOnly: true,
-        secure: true, // Solo en producción
+        secure: false, 
         sameSite: 'None' // Esto permite las cookies entre diferentes orígenes
       }
     })
