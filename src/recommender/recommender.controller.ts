@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Request, UnauthorizedException, Body } from '@nestjs/common';
+import { Controller, Get, Param, Request, UnauthorizedException, Body, Post } from '@nestjs/common';
 import { Neo4jService } from '../neo4j/neo4j.service';
 
 //funcionan todos los metodos con las sesiones activas
@@ -8,7 +8,7 @@ export class RecommenderController {
   constructor(private readonly neo4jService: Neo4jService) {}
 
   
-  @Get('recommend-by-genre')
+  @Post('recommend-by-genre')
 async recommendByGenre(@Body('userId') userId: number) {
   if (!userId) {
     throw new UnauthorizedException('Usuario no autenticado');
@@ -17,7 +17,7 @@ async recommendByGenre(@Body('userId') userId: number) {
   return await this.neo4jService.recommendByGenre(userId);
 }
 
-@Get('recommend-by-second-genre')
+@Post('recommend-by-second-genre')
 async recommendBySecondGenre(@Body('userId') userId: number) {
   if (!userId) {
     throw new UnauthorizedException('Usuario no autenticado');
@@ -26,7 +26,7 @@ async recommendBySecondGenre(@Body('userId') userId: number) {
   return await this.neo4jService.recommendBySecondGenre(userId);
 }
 
-@Get('recommend-by-artist')
+@Post('recommend-by-artist')
 async recommendByArtist(@Body('userId') userId: number) {
   if (!userId) {
     throw new UnauthorizedException('Usuario no autenticado');
@@ -36,7 +36,7 @@ async recommendByArtist(@Body('userId') userId: number) {
 }
 
   
-  @Get('recommend-artists-by-songs')
+  @Post('recommend-artists-by-songs')
   async recommendArtists(@Body('userId') userId: number) {
     
     if (!userId) {
