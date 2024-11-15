@@ -16,5 +16,12 @@ export class SearchController {
   async searchArtist(@Body('name') name: string) {
     return this.neo4jService.findArtistByName(name);
   }
+
+  // En tu controlador de canciones, añade este método
+@Post('check-favorite')
+async checkFavorite(@Body('userId') userId: string, @Body('trackId') trackId: string) {
+  return this.neo4jService.isFavorite(userId, trackId);
+}
+
 }
 

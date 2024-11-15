@@ -284,7 +284,20 @@ async findSongByName(songName: string) {
   
 
 
- 
+  async isFavorite(userId: string, trackId: string): Promise<boolean> {
+    const session = this.getSession();
+    const query = `
+      MATCH (u:User {usuario_id: $userId})-[r:TIENE_EN_FAVORITOS]->(s:Song {track_id: $trackId})
+      RETURN r
+    `;
+    try {
+      const result = await session.run(query, { userId, trackId });
+      return result.records.length > 0; // Retorna `true` si existe la relación
+    } finally {
+      await session.close();
+    }
+  }
+   
 
 
 
