@@ -128,14 +128,25 @@ export class Neo4jService {
   async recommendByGenre(userId: number) {
     const session = this.getSession();
     const query = `
-      MATCH (u:User {usuario_id: $userId})-[:TIENE_EN_FAVORITOS]->(s:Song)-[:PERTENECE_A]->(g:Genre)
-      WITH u, g, count(s) as songCount
-      ORDER BY songCount DESC LIMIT 1
-      MATCH (s:Song)-[:PERTENECE_A]->(g)
-      WHERE NOT (u)-[:TIENE_EN_FAVORITOS]->(s)
-      WITH DISTINCT s.track_name AS trackName, s
-      RETURN s
-      LIMIT 10
+       MATCH (u:User {usuario_id: $userId})-[:TIENE_EN_FAVORITOS]->(s:Song)-[:PERTENECE_A]->(g:Genre)
+    WITH u, g, count(s) AS songCount
+    ORDER BY songCount DESC LIMIT 1
+    
+    MATCH (song:Song)-[:PERTENECE_A]->(g)
+    WHERE NOT (u)-[:TIENE_EN_FAVORITOS]->(song)
+    
+    MATCH (song)-[:CANTADA_POR]->(artist:Artist)
+    
+    RETURN song.track_name AS trackName, 
+           song.duration_ms AS duration,
+           song.popularity AS popularity,
+           song.album_id AS albumId,
+           song.artist_id AS artistId,
+           song.genre_id AS genreId,
+           song.track_id AS trackId,
+           artist.artists AS artistName, 
+           g.track_genre AS genreName
+    LIMIT 10
 
     `;
     const result = await session.run(query, { userId: Number(userId) });
