@@ -54,6 +54,7 @@ export class Neo4jService {
   //usuario escucha cancion, ya funciona con la sesion del usuario
   async listenToSong(userId: number, trackId: string) {
     const session = this.getSession();
+    console.log(userId,trackId)
     const query = `
       MATCH (u:User {usuario_id: $userId}), (s:Song {track_id: $trackId})
       MERGE (u)-[:ESCUCHO]->(s)
