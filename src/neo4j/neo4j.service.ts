@@ -252,7 +252,14 @@ async findSongByName(songName: string) {
   `;
   try {
     const result = await session.run(query, { songName });
-    return result.records.map(record => record.get('s').properties);
+    return result.records.map(record => ({
+      trackId: record.get('trackId'),
+      trackName: record.get('trackName'),
+      artistId: record.get('artistId'),
+      artistName: record.get('artistName'),
+      genreId: record.get('genreId'),
+      genreName: record.get('genreName')
+    }));
   } finally {
     await session.close();
   }
