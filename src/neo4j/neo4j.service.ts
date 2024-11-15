@@ -57,14 +57,24 @@ export class Neo4jService {
     console.log(userId,trackId)
     const query = `
       MATCH (u:User {usuario_id: $userId})
-WITH u
-MATCH (s:Song {track_id: $trackId})
-MERGE (u)-[:ESCUCHO]->(s)
-RETURN u, s
+      WITH u
+      MATCH (s:Song {track_id: $trackId})
+      MERGE (u)-[:ESCUCHO]->(s)
+      RETURN u, s
 
     `;
+
+    const checkUser = await session.run(`MATCH (u:User {usuario_id: $userId}) RETURN u`, { userId });
+    const checkSong = await session.run(`MATCH (s:Song {track_id: $trackId}) RETURN s`, { trackId });
+
     try {
       const result = await session.run(query, { userId, trackId });
+      if (checkUser.records.length === 0) {
+        console.error("No se encontró el usuario con el ID especificado.");
+      }
+      if (checkSong.records.length === 0) {
+        console.error("No se encontró la canción con el ID especificado.");
+      }
 
       if (result.records.length > 0) {
         console.log("Relación ESCUCHO creada entre el usuario y la canción.");
