@@ -56,9 +56,12 @@ export class Neo4jService {
     const session = this.getSession();
     console.log(userId,trackId)
     const query = `
-      MATCH (u:User {usuario_id: $userId}), (s:Song {track_id: $trackId})
-      MERGE (u)-[:ESCUCHO]->(s)
-      RETURN u, s
+      MATCH (u:User {usuario_id: $userId})
+WITH u
+MATCH (s:Song {track_id: $trackId})
+MERGE (u)-[:ESCUCHO]->(s)
+RETURN u, s
+
     `;
     try {
       const result = await session.run(query, { userId, trackId });
