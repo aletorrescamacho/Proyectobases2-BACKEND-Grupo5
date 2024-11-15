@@ -244,9 +244,11 @@ export class Neo4jService {
 async findSongByName(songName: string) {
   const session = this.getSession();
   const query = `
-    MATCH (s:Song)
+    MATCH (s:Song)-[:CANTADA_POR]->(a:Artist), (s)-[:PERTENECE_A]->(g:Genre)
     WHERE toLower(s.track_name) CONTAINS toLower($songName)
-    RETURN s
+    RETURN s.track_id AS trackId, s.track_name AS trackName, 
+           a.artist_id AS artistId, a.artists AS artistName, 
+           g.genre_id AS genreId, g.track_genre AS genreName
   `;
   try {
     const result = await session.run(query, { songName });
