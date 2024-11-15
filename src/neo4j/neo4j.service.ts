@@ -284,19 +284,20 @@ async findSongByName(songName: string) {
   
 
 
-  async isFavorite(userId: string, trackId: string): Promise<boolean> {
-    const session = this.getSession();
-    const query = `
-      MATCH (u:User {usuario_id: $userId})-[r:TIENE_EN_FAVORITOS]->(s:Song {track_id: $trackId})
-      RETURN r
-    `;
-    try {
-      const result = await session.run(query, { userId, trackId });
-      return result.records.length > 0; // Retorna `true` si existe la relación
-    } finally {
-      await session.close();
-    }
+  // En tu servicio de Neo4j
+async checkFavorite(userId: string, trackName: string) {
+  const session = this.getSession();
+  const query = `
+    MATCH (u:User {usuario_id: $userId})-[:TIENE_EN_FAVORITOS]->(s:Song {track_name: $trackName})
+    RETURN COUNT(s) > 0 AS isFavorite
+  `;
+  try {
+    const result = await session.run(query, { userId: parseInt(userId), trackName });
+    return result.records[0].get("isFavorite");
+  } finally {
+    await session.close();
   }
+}
    
 
 
