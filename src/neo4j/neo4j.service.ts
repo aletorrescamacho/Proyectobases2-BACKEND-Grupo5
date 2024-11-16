@@ -151,8 +151,15 @@ export class Neo4jService {
       RETURN s
       LIMIT 10
 
+
     `;
+
+    const checkUser = await session.run(`MATCH (u:User {usuario_id: $userId}) RETURN u`, { userId });
+
     const result = await session.run(query, { userId: Number(userId) });
+    if (checkUser.records.length === 0) {
+      console.error("No se encontró el usuario con el ID especificado en recomendacion.");
+    }
     await session.close();
     return result.records.map(record => record.get('s').properties);
   } 

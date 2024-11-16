@@ -26,6 +26,8 @@ export class UserController {
   
     const userId = body.userId;
     const trackId = body.trackId;
+
+    console.log("Tipo de userId listentosong:", typeof userId);
   
     return this.neo4jService.listenToSong(userId, trackId);
   }

@@ -10,6 +10,7 @@ export class RecommenderController {
   
   @Post('recommend-by-genre')
 async recommendByGenre(@Body('userId') userId: number) {
+  console.log("Tipo de userId:", typeof userId);
   if (!userId) {
     throw new UnauthorizedException('Usuario no autenticado');
   }
