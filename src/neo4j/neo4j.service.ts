@@ -56,7 +56,7 @@ export class Neo4jService {
     const session = this.getSession();
     console.log(userId,trackId)
     const query = `
-      MATCH (u:User {usuario_id: $userId})
+      MATCH (u:User {usuario_id: toInteger($userId)})
       WITH u
       MATCH (s:Song {track_id: $trackId})
       MERGE (u)-[:ESCUCHO]->(s)

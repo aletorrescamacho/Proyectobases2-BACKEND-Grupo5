@@ -9,13 +9,13 @@ export class RecommenderController {
 
   
   @Post('recommend-by-genre')
-async recommendByGenre(@Body('userId') userId: number) {
-  console.log("Tipo de userId:", typeof userId);
-  if (!userId) {
-    throw new UnauthorizedException('Usuario no autenticado');
-  }
+  async recommendByGenre(@Body('userId') userId: any) {
+    console.log("Tipo de userId:", typeof userId);
+    if (!userId) {
+      throw new UnauthorizedException('Usuario no autenticado');
+    }
 
-  return await this.neo4jService.recommendByGenre(userId);
+    return await this.neo4jService.recommendByGenre(userId);
 }
 
 @Post('recommend-by-second-genre')
