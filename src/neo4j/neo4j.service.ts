@@ -95,7 +95,7 @@ export class Neo4jService {
   async addToFavorites(userId: number, trackId: string) {
   const session = this.getSession();
   const query = `
-    MATCH (u:User {usuario_id: $userId}), (s:Song {track_id: $trackId})
+    MATCH (u:User {usuario_id: toInteger($userId})), (s:Song {track_id: $trackId})
     MERGE (u)-[:TIENE_EN_FAVORITOS]->(s)
     RETURN u, s
   `;
@@ -121,7 +121,7 @@ export class Neo4jService {
   async followArtist(userId: number, artistId: number) {
     const session = this.getSession();
     const query = `
-      MATCH (u:User {usuario_id: $userId}), (a:Artist {artist_id: $artistId})
+      MATCH (u:User {usuario_id: toInteger($userId})), (a:Artist {artist_id: $artistId})
       MERGE (u)-[:SIGUE_A]->(a)
       RETURN u, a
     `;
@@ -142,7 +142,7 @@ export class Neo4jService {
   async recommendByGenre(userId: number) {
     const session = this.getSession();
     const query = `
-      MATCH (u:User {usuario_id: $userId})-[:TIENE_EN_FAVORITOS]->(s:Song)-[:PERTENECE_A]->(g:Genre)
+      MATCH (u:User {usuario_id: toInteger($userId}))-[:TIENE_EN_FAVORITOS]->(s:Song)-[:PERTENECE_A]->(g:Genre)
       WITH u, g, count(s) as songCount
       ORDER BY songCount DESC LIMIT 1
       MATCH (s:Song)-[:PERTENECE_A]->(g)
@@ -170,7 +170,7 @@ export class Neo4jService {
   async recommendBySecondGenre(userId: number) {
     const session = this.getSession();
     const query = `
-      MATCH (u:User {usuario_id: $userId})-[:TIENE_EN_FAVORITOS]->(s:Song)-[:PERTENECE_A]->(g:Genre)
+      MATCH (u:User {usuario_id: toInteger($userId}))-[:TIENE_EN_FAVORITOS]->(s:Song)-[:PERTENECE_A]->(g:Genre)
       WITH u, g, count(s) as songCount
       ORDER BY songCount DESC SKIP 1 LIMIT 1
       MATCH (s:Song)-[:PERTENECE_A]->(g) 
@@ -190,7 +190,7 @@ export class Neo4jService {
     console.log('Session established:', session);
 
     const query = `
-      MATCH (u:User {usuario_id : $userId})-[:ESCUCHO]->(s:Song)-[:CANTADA_POR]->(a:Artist)
+      MATCH (u:User {usuario_id : toInteger($userId}))-[:ESCUCHO]->(s:Song)-[:CANTADA_POR]->(a:Artist)
       WITH u, a, count(s) as songCount
       ORDER BY songCount DESC LIMIT 1
       MATCH (a)<-[:CANTADA_POR]-(s:Song)
@@ -223,7 +223,7 @@ export class Neo4jService {
   async recommendArtists(userId: number) {
     const session = this.getSession();
     const query = `
-      MATCH (u:User {usuario_id: $userId})-[:ESCUCHO]->(s:Song)-[:CANTADA_POR]->(a:Artist)
+      MATCH (u:User {usuario_id: toInteger($userId}))-[:ESCUCHO]->(s:Song)-[:CANTADA_POR]->(a:Artist)
       WITH a, count(s) as playCount, u
       ORDER BY playCount DESC
       LIMIT 10  // Selecciona los 10 artistas más reproducidos
@@ -309,7 +309,7 @@ async findSongByName(songName: string) {
 async checkFavorite(userId: string, trackName: string) {
   const session = this.getSession();
   const query = `
-    MATCH (u:User {usuario_id: $userId})-[:TIENE_EN_FAVORITOS]->(s:Song {track_name: $trackName})
+    MATCH (u:User {usuario_id: toInteger($userId}))-[:TIENE_EN_FAVORITOS]->(s:Song {track_name: $trackName})
     RETURN COUNT(s) > 0 AS isFavorite
   `;
   try {
