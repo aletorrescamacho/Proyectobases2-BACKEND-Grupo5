@@ -148,7 +148,7 @@ export class Neo4jService {
   async followArtist(userId: number, artistId: number) {
     const session = this.getSession();
     const query = `
-      MATCH (u:User {usuario_id: toInteger($userId})), (a:Artist {artist_id: toInteger($artistId)})
+      MATCH (u:User {usuario_id: toInteger($userId)}), (a:Artist {artist_id: toInteger($artistId)})
       MERGE (u)-[:SIGUE_A]->(a)
       RETURN u, a
     `;
