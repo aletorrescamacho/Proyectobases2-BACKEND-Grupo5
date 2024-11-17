@@ -148,7 +148,7 @@ export class Neo4jService {
   async followArtist(userId: number, artistId: number) {
     const session = this.getSession();
     const query = `
-      MATCH (u:User {usuario_id: toInteger($userId})), (a:Artist {artist_id: $artistId})
+      MATCH (u:User {usuario_id: toInteger($userId})), (a:Artist {artist_id: toInteger($artistId)})
       MERGE (u)-[:SIGUE_A]->(a)
       RETURN u, a
     `;
@@ -167,7 +167,7 @@ export class Neo4jService {
   async stopFollowingArtist(userId: number, artistId: number) {
     const session = this.getSession();
     const query = `
-      MATCH (u:User {usuario_id: toInteger($userId)})-[r:SIGUE_A]->(a:Artist {artist_id: $artistId})
+      MATCH (u:User {usuario_id: toInteger($userId)})-[r:SIGUE_A]->(a:Artist {artist_id: toInteger($artistId)})
       DELETE r
     `;
     try {
