@@ -117,6 +117,33 @@ export class Neo4jService {
   }
 }
 
+  //usuario quita cancion de favoritos
+  async quitFromFav(userId: number, trackId: string) {
+    const session = this.getSession();
+    const query = `
+    MATCH (u:User {usuario_id: toInteger($userId)})-[r:TIENE_EN_FAVORITOS]->(s:Song {track_id: $trackId})
+    DELETE r
+  `;
+    
+  try {
+    const result = await session.run(query, { userId, trackId });
+    
+    if (result.records.length > 0) {
+      console.log("Relación TIENE_EN_FAVORITOS DESTRUIDA entre el usuario y la canción.");
+      return true;
+    } else {
+      console.log("No se encontraron nodos de usuario o canción con los IDs especificados.");
+      return false;
+    }
+  } catch (error) {
+    console.error("Error al DESTRUIR relación TIENE_EN_FAVORITOS:", error);
+    throw new Error("Error al DESTRUIR relación TIENE_EN_FAVORITOS");
+  } finally {
+    await session.close();
+  }
+
+  }
+
   //usuario sigue a cantante
   async followArtist(userId: number, artistId: number) {
     const session = this.getSession();

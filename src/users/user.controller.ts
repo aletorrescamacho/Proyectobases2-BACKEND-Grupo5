@@ -50,6 +50,22 @@ export class UserController {
     return this.neo4jService.addToFavorites(userId, trackId);
   }
 
+  // Relación TIENE_EN_FAVORITOS entre Usuario y Canción MODIFICADO PARA QUE MANTENGA LA SESION
+  @Post('quit-from-favorites')
+  async quitFromFav(@Body() body: { trackId: string, userId: number }) {
+    
+    // Verifica que el userId esté presente
+    if (!body.userId) {
+      throw new UnauthorizedException('Usuario no autenticado');
+    }
+
+    // Obtiene el userId desde la sesión activa
+    const userId = body.userId;
+    const trackId = body.trackId;
+
+    return this.neo4jService.quitFromFav(userId, trackId);
+  }
+
 
 
   // Relación SIGUE_A entre Usuario y Artista ACTUALIZADO MANTIENE SESION ACTIVA
