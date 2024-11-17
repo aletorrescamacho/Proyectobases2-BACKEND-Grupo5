@@ -95,7 +95,7 @@ export class Neo4jService {
   async addToFavorites(userId: number, trackId: string) {
   const session = this.getSession();
   const query = `
-    MATCH (u:User {usuario_id: toInteger($userId}), (s:Song {track_id: $trackId})
+    MATCH (u:User {usuario_id: toInteger($userId)}), (s:Song {track_id: $trackId})
     MERGE (u)-[:TIENE_EN_FAVORITOS]->(s)
     RETURN u, s
   `;
