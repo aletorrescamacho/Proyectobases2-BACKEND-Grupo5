@@ -163,6 +163,24 @@ export class Neo4jService {
     }
   }
 
+  //usuario deja de seguir a cantante
+  async stopFollowingArtist(userId: number, artistId: number) {
+    const session = this.getSession();
+    const query = `
+      MATCH (u:User {usuario_id: toInteger($userId)})-[r:SIGUE_A]->(a:Artist {artist_id: $artistId})
+      DELETE r
+    `;
+    try {
+      const result = await session.run(query, { userId, artistId });
+      return result.records.length > 0;
+    } catch (error) {
+      console.error("Error al DESTRUIR relación SIGUE_A:", error);
+      throw new Error("Error al DESTRUIR relación SIGUE_A");
+    } finally {
+      await session.close();
+    }
+  }
+
   ////////METODOS////////////DE///////////////RECOMENDACIONES///////////////////////////////////////
 
   //encuentra canciones del genero que mas veces se repite (Top1) basado en CANCIONES FAV LISTO
