@@ -371,7 +371,7 @@ async checkFollow(userId: string, artistId: number) {
   const session = this.getSession();
   const query = `
     MATCH (u:User {usuario_id: $userId})-[:SIGUE_A]->(a:Artist {artist_id: toInteger($artistId)})
-    RETURN COUNT(s) > 0 AS isFavorite
+    RETURN COUNT(a) > 0 AS isFavorite
   `;
   try {
     const result = await session.run(query, { userId: parseInt(userId), artistId });
