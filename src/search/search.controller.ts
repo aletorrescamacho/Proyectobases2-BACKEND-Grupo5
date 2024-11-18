@@ -23,5 +23,14 @@ export class SearchController {
     return this.neo4jService.checkFavorite(body.userId, body.trackName);
   }
 
+  //revisa si se sigue al artista o no
+  @Post('check-follow')
+  async checkFolllow(@Body() body: { userId: string, artistId: number }) {
+    return this.neo4jService.checkFollow(body.userId, body.artistId);
+  }
+
 }
+
+
+
 

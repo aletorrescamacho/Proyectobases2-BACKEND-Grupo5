@@ -350,7 +350,7 @@ async findSongByName(songName: string) {
   
 
 
-  // En tu servicio de Neo4j
+  // Revisa que la cancion este en favoritos o no
 async checkFavorite(userId: string, trackName: string) {
   const session = this.getSession();
   const query = `
@@ -365,8 +365,21 @@ async checkFavorite(userId: string, trackName: string) {
   }
 }
    
-
-
+//Revisa que el artista se siga o no
+async checkFollow(userId: string, artistId: number) {
+  console.log(artistId);
+  const session = this.getSession();
+  const query = `
+    MATCH (u:User {usuario_id: $userId})-[:SIGUE_A]->(a:Artist {artist_id: toInteger($artistId)})
+    RETURN COUNT(s) > 0 AS isFavorite
+  `;
+  try {
+    const result = await session.run(query, { userId: parseInt(userId), artistId });
+    return result.records[0].get("isFavorite");
+  } finally {
+    await session.close();
+  }
+}
 
 
 
