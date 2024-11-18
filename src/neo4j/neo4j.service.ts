@@ -315,6 +315,7 @@ async findSongByName(songName: string) {
     RETURN s.track_id AS trackId, s.track_name AS trackName, 
            a.artist_id AS artistId, a.artists AS artistName, 
            g.genre_id AS genreId, g.track_genre AS genreName
+    LIMIT 100
   `;
   try {
     const result = await session.run(query, { songName });
@@ -339,6 +340,7 @@ async findSongByName(songName: string) {
       MATCH (a:Artist)
       WHERE toLower(a.artists) CONTAINS toLower($artistName)
       RETURN a
+      LIMIT 100
     `;
     try {
       const result = await session.run(query, { artistName });
